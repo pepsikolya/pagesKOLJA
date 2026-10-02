@@ -3,125 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hrací kostka</title>
+    <title>Kostky</title>
     <style>
         :root {
-            --bg-color: #f4f5f7;
-            --card-bg: #ffffff;
-            --text-primary: #172b4d;
-            --text-secondary: #6b778c;
-            --border-color: #dfe1e6;
-            --accent-color: #0052cc;
-            --accent-hover: #0065ff;
+            --bg: #f5f5f7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent: #0071e3;
+            --accent-hover: #0077ed;
             --dice-bg: #ffffff;
-            --dice-border: #091e42;
-            --pip-color: #091e42;
+            --dice-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            --pip-color: #1d1d1f;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #000000;
+                --card-bg: rgba(28, 28, 30, 0.8);
+                --card-border: rgba(255, 255, 255, 0.12);
+                --text-primary: #f5f5f7;
+                --text-secondary: #86868b;
+                --accent: #2997ff;
+                --accent-hover: #3b9eff;
+                --dice-bg: #2c2c2e;
+                --dice-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+                --pip-color: #f5f5f7;
+            }
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+        .window {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
             padding: 32px;
-            box-shadow: 0 4px 12px rgba(9, 30, 66, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 28px;
         }
 
         header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
+            letter-spacing: -0.01em;
         }
 
-        p.subtitle {
-            font-size: 14px;
+        .icon-btn {
+            background: transparent;
+            border: none;
             color: var(--text-secondary);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.15s, background-color 0.15s;
         }
 
-        /* Controls */
+        .icon-btn:hover {
+            color: var(--text-primary);
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-btn.active {
+            color: var(--accent);
+        }
+
+        /* Controls Grid */
         .controls {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
-        .control-group {
+        .control-item {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
 
         label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 11px;
+            font-weight: 500;
             color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
-        select {
+        select, input[type="number"] {
             font-family: inherit;
             font-size: 14px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: #fafbfc;
+            font-weight: 500;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            background-color: rgba(0, 0, 0, 0.02);
             color: var(--text-primary);
             outline: none;
-            cursor: pointer;
-            transition: border-color 0.2s, background-color 0.2s;
+            appearance: none;
+            transition: all 0.2s ease;
         }
 
-        select:hover {
-            background-color: #f4f5f7;
+        select:focus, input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
         }
 
-        select:focus {
-            border-color: var(--accent-color);
-        }
-
-        /* Dice Display Area */
-        .dice-area {
+        /* Playground */
+        .stage {
+            min-height: 140px;
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
             align-items: center;
-            gap: 24px;
-            min-height: 120px;
-            padding: 16px 0;
-            perspective: 1000px;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px 0;
+            perspective: 800px;
         }
 
         /* 3D Cube */
         .scene {
-            width: 80px;
-            height: 80px;
+            width: 72px;
+            height: 72px;
             perspective: 400px;
         }
 
@@ -130,19 +168,19 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .cube-face {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 72px;
+            height: 72px;
             background: var(--dice-bg);
-            border: 2px solid var(--dice-border);
-            border-radius: 12px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--dice-shadow);
             display: grid;
             grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-            padding: 6px;
+            padding: 8px;
             box-sizing: border-box;
         }
 
@@ -152,19 +190,17 @@
             border-radius: 50%;
             align-self: center;
             justify-self: center;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
         }
 
-        /* 3D Face Rotations */
-        .face-1 { transform: rotateY(0deg) translateZ(40px); }
-        .face-2 { transform: rotateY(90deg) translateZ(40px); }
-        .face-3 { transform: rotateX(-90deg) translateZ(40px); }
-        .face-4 { transform: rotateX(90deg) translateZ(40px); }
-        .face-5 { transform: rotateY(-90deg) translateZ(40px); }
-        .face-6 { transform: rotateY(180deg) translateZ(40px); }
+        .face-1 { transform: rotateY(0deg) translateZ(36px); }
+        .face-2 { transform: rotateY(90deg) translateZ(36px); }
+        .face-3 { transform: rotateX(-90deg) translateZ(36px); }
+        .face-4 { transform: rotateX(90deg) translateZ(36px); }
+        .face-5 { transform: rotateY(-90deg) translateZ(36px); }
+        .face-6 { transform: rotateY(180deg) translateZ(36px); }
 
-        /* Pip Positions */
         .pip:nth-child(1) { grid-area: 1 / 1; }
         .pip:nth-child(2) { grid-area: 1 / 3; }
         .pip:nth-child(3) { grid-area: 2 / 2; }
@@ -173,88 +209,122 @@
         .pip:nth-child(6) { grid-area: 2 / 1; }
         .pip:nth-child(7) { grid-area: 2 / 3; }
 
-        /* Non-D6 Display */
+        /* Polyhedral Dice Display */
         .poly-dice {
-            width: 80px;
-            height: 80px;
+            width: 72px;
+            height: 72px;
             background: var(--dice-bg);
-            border: 2px solid var(--dice-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--dice-shadow);
             color: var(--text-primary);
-            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 24px;
+            font-weight: 600;
             transition: transform 0.4s ease;
         }
 
-        /* Primary Action Button */
-        button.btn-roll {
+        /* Action Button */
+        button.primary-btn {
             font-family: inherit;
             font-size: 15px;
-            font-weight: 600;
-            background-color: var(--accent-color);
+            font-weight: 500;
+            background-color: var(--accent);
             color: #ffffff;
             border: none;
-            border-radius: 6px;
+            border-radius: var(--radius-md);
             padding: 12px 20px;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.2s;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        button.btn-roll:hover {
+        button.primary-btn:hover {
             background-color: var(--accent-hover);
         }
 
-        button.btn-roll:active {
-            transform: translateY(1px);
+        button.primary-btn:active {
+            transform: scale(0.98);
         }
 
-        /* Summary Output */
-        .results-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 16px;
+        /* Results Board */
+        .score-board {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
         }
 
-        .result-card {
-            background-color: #fafbfc;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 12px;
-            text-align: center;
+        .score-item {
+            display: flex;
+            flex-direction: column;
         }
 
-        .result-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .result-label {
-            font-size: 11px;
+        .score-value {
+            font-size: 28px;
             font-weight: 600;
-            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        .score-label {
+            font-size: 11px;
+            font-weight: 500;
             color: var(--text-secondary);
-            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        /* History Drawer */
+        .history-drawer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-drawer.open {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .history-entry {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 8px 12px;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+        }
+
+        .history-entry strong {
+            color: var(--text-primary);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="window">
         <header>
-            <h1>Hrací kostka</h1>
-            <p class="subtitle">Generátor náhodných hodu</p>
+            <h1>Kostky</h1>
+            <div style="display: flex; gap: 4px;">
+                <button id="sound-toggle" class="icon-btn active" title="Zvuk" onclick="toggleAudio()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                </button>
+                <button class="icon-btn" title="Historie" onclick="toggleHistory()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </button>
+            </div>
         </header>
 
         <div class="controls">
-            <div class="control-group">
-                <label for="dice-count">Počet kostek</label>
+            <div class="control-item">
+                <label for="dice-count">Počet</label>
                 <select id="dice-count" onchange="setupDice()">
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -263,10 +333,10 @@
                 </select>
             </div>
 
-            <div class="control-group">
-                <label for="dice-type">Typ kostky</label>
+            <div class="control-item">
+                <label for="dice-type">Typ</label>
                 <select id="dice-type" onchange="setupDice()">
-                    <option value="6">D6 (Klasická)</option>
+                    <option value="6">D6</option>
                     <option value="4">D4</option>
                     <option value="8">D8</option>
                     <option value="10">D10</option>
@@ -274,28 +344,37 @@
                     <option value="20">D20</option>
                 </select>
             </div>
-        </div>
 
-        <div id="dice-playground" class="dice-area"></div>
-
-        <button class="btn-roll" onclick="rollAll()">Hodit kostkou</button>
-
-        <div class="results-panel">
-            <div class="result-card">
-                <div id="total-sum" class="result-value">0</div>
-                <div class="result-label">Součet</div>
-            </div>
-            <div class="result-card">
-                <div id="roll-count" class="result-value">0</div>
-                <div class="result-label">Celkem hodů</div>
+            <div class="control-item">
+                <label for="modifier">Bonus (+/-)</label>
+                <input type="number" id="modifier" value="0" step="1" onchange="updateTotalDisplay()">
             </div>
         </div>
+
+        <div id="stage" class="stage"></div>
+
+        <button class="primary-btn" onclick="rollAll()">Hodit</button>
+
+        <div class="score-board">
+            <div class="score-item">
+                <span id="total-val" class="score-value">0</span>
+                <span class="score-label">Výsledek</span>
+            </div>
+            <div class="score-item" style="text-align: right;">
+                <span id="rolls-count" class="score-value" style="font-size: 18px; color: var(--text-secondary);">0</span>
+                <span class="score-label">Hody</span>
+            </div>
+        </div>
+
+        <div id="history-drawer" class="history-drawer"></div>
     </div>
 
     <script>
         let rollCounter = 0;
+        let lastRollBaseSum = 0;
+        let soundEnabled = true;
+        let audioCtx = null;
 
-        // Mathematical rotation mapping for 3D D6 faces
         const rotations = {
             1: { x: 0,   y: 0 },
             2: { x: 0,   y: -90 },
@@ -304,6 +383,37 @@
             5: { x: 0,   y: 90 },
             6: { x: 0,   y: 180 }
         };
+
+        function playSoftClick() {
+            if (!soundEnabled) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
+
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-toggle').classList.toggle('active', soundEnabled);
+        }
+
+        function toggleHistory() {
+            document.getElementById('history-drawer').classList.toggle('open');
+        }
 
         function createCubeElement() {
             const scene = document.createElement('div');
@@ -322,41 +432,49 @@
         }
 
         function setupDice() {
-            const container = document.getElementById('dice-playground');
+            const stage = document.getElementById('stage');
             const count = parseInt(document.getElementById('dice-count').value, 10);
             const type = parseInt(document.getElementById('dice-type').value, 10);
 
-            container.innerHTML = '';
+            stage.innerHTML = '';
 
             for (let i = 0; i < count; i++) {
                 if (type === 6) {
-                    container.appendChild(createCubeElement());
+                    stage.appendChild(createCubeElement());
                 } else {
                     const poly = document.createElement('div');
                     poly.className = 'poly-dice';
                     poly.innerText = '-';
-                    container.appendChild(poly);
+                    stage.appendChild(poly);
                 }
             }
         }
 
+        function updateTotalDisplay() {
+            const modifier = parseInt(document.getElementById('modifier').value, 10) || 0;
+            const finalTotal = lastRollBaseSum + modifier;
+            document.getElementById('total-val').innerText = lastRollBaseSum > 0 ? finalTotal : 0;
+        }
+
         function rollAll() {
+            playSoftClick();
+            
             const type = parseInt(document.getElementById('dice-type').value, 10);
-            const container = document.getElementById('dice-playground');
-            let sum = 0;
+            const stage = document.getElementById('stage');
+            let baseSum = 0;
+            let individualResults = [];
 
             if (type === 6) {
-                const cubes = container.querySelectorAll('.cube');
+                const cubes = stage.querySelectorAll('.cube');
                 cubes.forEach(cube => {
-                    const value = Math.floor(Math.random() * 6) + 1;
-                    sum += value;
+                    const val = Math.floor(Math.random() * 6) + 1;
+                    baseSum += val;
+                    individualResults.push(val);
 
                     let currentX = parseInt(cube.getAttribute('data-x'), 10) || 0;
                     let currentY = parseInt(cube.getAttribute('data-y'), 10) || 0;
+                    const target = rotations[val];
 
-                    const target = rotations[value];
-
-                    // Add full 360-degree rotations to preserve smooth animation flow
                     let nextX = currentX + 720 + (target.x - (currentX % 360));
                     let nextY = currentY + 720 + (target.y - (currentY % 360));
 
@@ -365,25 +483,50 @@
                     cube.setAttribute('data-y', nextY);
                 });
             } else {
-                const polyDice = container.querySelectorAll('.poly-dice');
+                const polyDice = stage.querySelectorAll('.poly-dice');
                 polyDice.forEach(dice => {
-                    const value = Math.floor(Math.random() * type) + 1;
-                    sum += value;
+                    const val = Math.floor(Math.random() * type) + 1;
+                    baseSum += val;
+                    individualResults.push(val);
 
-                    dice.style.transform = 'scale(0.9)';
+                    dice.style.transform = 'scale(0.92)';
                     setTimeout(() => {
-                        dice.innerText = value;
+                        dice.innerText = val;
                         dice.style.transform = 'scale(1)';
-                    }, 150);
+                    }, 120);
                 });
             }
 
+            lastRollBaseSum = baseSum;
             rollCounter++;
-            document.getElementById('total-sum').innerText = sum;
-            document.getElementById('roll-count').innerText = rollCounter;
+
+            setTimeout(() => {
+                updateTotalDisplay();
+                document.getElementById('rolls-count').innerText = rollCounter;
+                
+                // Add to history drawer
+                const historyDrawer = document.getElementById('history-drawer');
+                const entry = document.createElement('div');
+                entry.className = 'history-entry';
+                const modifier = parseInt(document.getElementById('modifier').value, 10) || 0;
+                const modStr = modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : '';
+                entry.innerHTML = `<span>Hod #${rollCounter} [${individualResults.join(', ')}]${modStr}</span><strong>${baseSum + modifier}</strong>`;
+                historyDrawer.prepend(entry);
+            }, 250);
         }
 
-        // Initialize default view
+        // Shake to roll detection for mobile
+        let lastShakeTime = 0;
+        window.addEventListener('devicemotion', (e) => {
+            const acc = e.accelerationIncludingGravity;
+            if (!acc) return;
+            const delta = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+            if (delta > 20 && (Date.now() - lastShakeTime > 1000)) {
+                lastShakeTime = Date.now();
+                rollAll();
+            }
+        });
+
         setupDice();
     </script>
 </body>
