@@ -3,90 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hrací kostka</title>
+    <title>Super Kostka Studio 3D</title>
     <style>
-        /* CSS: Vzhled a stylování stránky */
+        :root {
+            --bg-grad-1: #1a1c29;
+            --bg-grad-2: #0e1017;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent: #ff3366;
+            --accent-glow: rgba(255, 51, 102, 0.4);
+            --dice-bg: #ffffff;
+            --dice-dot: #111111;
+            --text-color: #ffffff;
+        }
+
+        /* Color Schemes */
+        [data-theme="cyberpunk"] {
+            --bg-grad-1: #0f051d;
+            --bg-grad-2: #290025;
+            --accent: #00f0ff;
+            --accent-glow: rgba(0, 240, 255, 0.5);
+            --dice-bg: #120024;
+            --dice-dot: #00f0ff;
+        }
+
+        [data-theme="gold"] {
+            --bg-grad-1: #1c1917;
+            --bg-grad-2: #0c0a09;
+            --accent: #eab308;
+            --accent-glow: rgba(234, 179, 8, 0.4);
+            --dice-bg: #fef08a;
+            --dice-dot: #713f12;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at center, var(--bg-grad-1), var(--bg-grad-2));
+            color: var(--text-color);
+            min-height: 100vh;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
         }
 
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+        .app-container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         h1 {
-            color: #333;
-            margin-top: 0;
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Vizuální podoba kostky */
-        .dice {
-            width: 100px;
-            height: 100px;
-            background-color: #fff;
-            border: 3px solid #333;
+        /* Controls Panel */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        select, button {
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select option {
+            background: #111;
+            color: #fff;
+        }
+
+        select:hover, button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent);
+        }
+
+        /* Dice Playground */
+        .dice-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            min-height: 200px;
+            width: 100%;
+            perspective: 1000px;
+            padding: 20px 0;
+        }
+
+        /* 3D Cube Styling */
+        .scene {
+            width: 80px;
+            height: 80px;
+            perspective: 600px;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: var(--dice-bg);
+            border: 2px solid rgba(0,0,0,0.1);
             border-radius: 16px;
-            font-size: 48px;
+            display: grid;
+            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+            padding: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.15);
+            box-sizing: border-box;
+        }
+
+        .pip {
+            display: block;
+            background-color: var(--dice-dot);
+            border-radius: 50%;
+            align-self: center;
+            justify-self: center;
+            width: 12px;
+            height: 12px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        /* 3D Face Positions */
+        .face-1 { transform: rotateY(  0deg) translateZ(40px); }
+        .face-6 { transform: rotateY(180deg) translateZ(40px); }
+        .face-2 { transform: rotateY( 90deg) translateZ(40px); }
+        .face-5 { transform: rotateY(-90deg) translateZ(40px); }
+        .face-3 { transform: rotateX( 90deg) translateZ(40px); }
+        .face-4 { transform: rotateX(-90deg) translateZ(40px); }
+
+        /* Polyhedral (D4, D8, D20 etc.) display style */
+        .poly-dice {
+            width: 80px;
+            height: 80px;
+            background: var(--dice-bg);
+            color: var(--dice-dot);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 20px auto;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
+            font-size: 1.8rem;
+            font-weight: bold;
+            box-shadow: 0 0 20px var(--accent-glow);
+            transition: transform 0.8s ease;
         }
 
-        /* Tlačítko */
-        button {
-            background-color: #007bff;
-            color: white;
+        /* Pip layout alignments */
+        .pip:nth-child(1) { grid-area: 1 / 1; }
+        .pip:nth-child(2) { grid-area: 1 / 3; }
+        .pip:nth-child(3) { grid-area: 2 / 2; }
+        .pip:nth-child(4) { grid-area: 3 / 1; }
+        .pip:nth-child(5) { grid-area: 3 / 3; }
+        .pip:nth-child(6) { grid-area: 2 / 1; }
+        .pip:nth-child(7) { grid-area: 2 / 3; }
+
+        /* Primary Roll Button */
+        .btn-roll {
+            background: var(--accent);
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 0.8rem 2.5rem;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            box-shadow: 0 0 15px var(--accent-glow);
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .btn-roll:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--accent-glow);
+            background: var(--accent);
+        }
+
+        .btn-roll:active {
+            transform: translateY(1px);
+        }
+
+        /* Results & Stats */
+        .stats-panel {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            border-top: 1px solid var(--card-border);
+            padding-top: 1rem;
+            text-align: center;
+        }
+
+        .stat-box .val {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .stat-box .lbl {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        /* History log */
+        .history {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            max-width: 100%;
+            padding: 5px;
+        }
+
+        .history-chip {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            white-space: nowrap;
         }
     </style>
 </head>
-<body>
+<body data-theme="default">
 
-    <div class="container">
-        <h1>Hrací kostka</h1>
-        
-        <!-- HTML: Zde se bude zobrazovat hozené číslo -->
-        <div id="dice" class="dice">?</div>
-        
-        <!-- HTML: Tlačítko pro spuštění akce v JavaScriptu -->
-        <button onclick="hodKostkou()">Hodit kostkou</button>
+    <div class="app-container">
+        <h1>🎲 3D Dice Studio</h1>
+
+        <!-- Settings & Controls -->
+        <div class="controls">
+            <div class="control-group">
+                <label>Počet kostek</label>
+                <select id="dice-count" onchange="setupDice()">
+                    <option value="1">1 Kostka</option>
+                    <option value="2">2 Kostky</option>
+                    <option value="3">3 Kostky</option>
+                    <option value="4">4 Kostky</option>
+                    <option value="5">5 Kostek</option>
+                    <option value="6">6 Kostek</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Typ kostky</label>
+                <select id="dice-type" onchange="setupDice()">
+                    <option value="6">D6 (Klasická)</option>
+                    <option value="4">D4 (4-stěnná)</option>
+                    <option value="8">D8 (8-stěnná)</option>
+                    <option value="10">D10 (10-stěnná)</option>
+                    <option value="12">D12 (12-stěnná)</option>
+                    <option value="20">D20 (20-stěnná)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Vzhled</label>
+                <select id="theme-select" onchange="changeTheme(this.value)">
+                    <option value="default">Klasik</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="gold">Zlatá</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Interactive Dice Playground -->
+        <div id="dice-playground" class="dice-area"></div>
+
+        <!-- Action Button -->
+        <button class="btn-roll" onclick="rollAll()">HODIT KOSTKOU</button>
+
+        <!-- Stats Dashboard -->
+        <div class="stats-panel">
+            <div class="stat-box">
+                <div id="total-sum" class="val">0</div>
+                <div class="lbl">Součet</div>
+            </div>
+            <div class="stat-box">
+                <div id="roll-count" class="val">0</div>
+                <div class="lbl">Počet hodů</div>
+            </div>
+            <div class="stat-box">
+                <div id="average-val" class="val">0</div>
+                <div class="lbl">Průměr</div>
+            </div>
+        </div>
+
+        <!-- History Strip -->
+        <div class="history" id="history-log"></div>
     </div>
 
     <script>
-        // JAVASCRIPT: Logika aplikace
-        function hodKostkou() {
-            // 1. Vygeneruje náhodné číslo od 1 do 6
-            let cislo = Math.floor(Math.random() * 6) + 1;
+        let totalRollsCount = 0;
+        let cumulativeSum = 0;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-            // 2. Najde element kostky v HTML podle jeho ID
-            let kostkaElement = document.getElementById("dice");
-
-            // 3. Změní text uvnitř elementu na vygenerované číslo
-            kostkaElement.textContent = cislo;
+        // Synthesize rolling sound effect without external files
+        function playRollSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.15);
+            
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
         }
-    </script>
 
+        // Generate 3D standard D6 structure
+        function create3DDiceHTML() {
+            return `
+                <div class="scene">
+                    <div class="cube">
+                        <div class="cube-face face-1"><span class="pip"></span></div>
+                        <div class="cube-face face-2"><span class="pip"></span><span class="pip"></span></div>
+                        <div class="cube-face face-3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                        <div class="cube-face face-4"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                        <div class="cube-face face-5"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                        <div class="cube-face face-6"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize dice layout
+        function setupDice() {
+            const container = document.getElementById('dice-playground');
+            const count = parseInt(document.getElementById('dice-count').value);
+            const type = parseInt(document.getElementById('dice-type').value);
+            
+            container.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                if (type === 6) {
+                    container.innerHTML += create3DDiceHTML();
+                } else {
+                    const poly = document.createElement('div');
+                    poly.className = 'poly-dice';
+                    poly.innerText = '?';
+                    container.appendChild(poly);
+                }
+            }
+        }
+
+        // Main action trigger
+        function rollAll() {
+            const diceType = parseInt(document.getElementById('dice-type').value);
+            const count = parseInt(document.getElementById('dice-count').value);
+            const playground = document.getElementById('dice-playground');
+            
+            playRollSound();
+            if (navigator.vibrate) navigator.vibrate(50); // Mobile haptic feedback
+
+            let currentRollTotal = 0;
+
+            if (diceType === 6) {
+                const cubes = playground.querySelectorAll('.cube');
+                cubes.forEach(cube => {
+                    const result = Math.floor(Math.random() * 6) + 1;
+                    currentRollTotal += result;
+                    
+                    // Generate wild random rotations + align to target face
+                    const xRots = [0, 0, -90, 90, 0, 180];
+                    const yRots = [0, -90, 0, 0, 90, 0];
+                    
+                    const extraSpinsX = (Math.floor(Math.random() * 3) + 2) * 360;
+                    const extraSpinsY = (Math.floor(Math.random() * 3) + 2) * 360;
+                    
+                    const targetX = xRots[result - 1] + extraSpinsX;
+                    const targetY = yRots[result - 1] + extraSpinsY;
+
+                    cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+                });
+            } else {
+                const polyDice = playground.querySelectorAll('.poly-dice');
+                polyDice.forEach(dice => {
+                    const result = Math.floor(Math.random() * diceType) + 1;
+                    currentRollTotal += result;
+
+                    dice.style.transform = 'scale(0.8) rotate(360deg)';
+                    setTimeout(() => {
+                        dice.innerText = result;
+                        dice.style.transform = 'scale(1) rotate(0deg)';
+                    }, 300);
+                });
+            }
+
+            // Update stats
+            setTimeout(() => {
+                totalRollsCount++;
+                cumulativeSum += currentRollTotal;
+                
+                document.getElementById('total-sum').innerText = currentRollTotal;
+                document.getElementById('roll-count').innerText = totalRollsCount;
+                document.getElementById('average-val').innerText = (cumulativeSum / (totalRollsCount * count)).toFixed(1);
+
+                // Add item to history
+                const history = document.getElementById('history-log');
+                const chip = document.createElement('div');
+                chip.className = 'history-chip';
+                chip.innerText = `#${totalRollsCount}: ${currentRollTotal}`;
+                history.prepend(chip);
+            }, 800);
+        }
+
+        function changeTheme(themeName) {
+            document.body.setAttribute('data-theme', themeName);
+        }
+
+        // Initial setup on load
+        setupDice();
+    </script>
 </body>
 </html>
