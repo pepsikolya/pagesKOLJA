@@ -3,80 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Randomization</title>
+    <title>Studio Randomization - Aero Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root {
-            --bg: #f5f5f7;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-border: rgba(0, 0, 0, 0.08);
-            --text-primary: #1d1d1f;
-            --text-secondary: #86868b;
-            --accent: #0071e3;
-            --accent-hover: #0077ed;
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #000000;
-                --card-bg: rgba(28, 28, 30, 0.85);
-                --card-border: rgba(255, 255, 255, 0.12);
-                --text-primary: #f5f5f7;
-                --text-secondary: #86868b;
-                --accent: #2997ff;
-                --accent-hover: #3b9eff;
-            }
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-primary);
+            font-family: "Segoe UI", "Lucida Grande", Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            -webkit-font-smoothing: antialiased;
+            /* Frutiger Aero vibrant sky/ocean backdrop */
+            background: radial-gradient(circle at 30% 20%, #a8e0ff 0%, #3e9bd6 40%, #005b94 85%, #002d52 100%);
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
         }
 
+        /* Ambient floating light orbs (Aero motif) */
+        body::before, body::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(40px);
+            opacity: 0.6;
+        }
+
+        body::before {
+            width: 350px;
+            height: 350px;
+            background: rgba(255, 255, 255, 0.4);
+            top: -50px;
+            left: 10%;
+        }
+
+        body::after {
+            width: 450px;
+            height: 450px;
+            background: rgba(112, 224, 180, 0.35);
+            bottom: -100px;
+            right: 10%;
+        }
+
+        /* Glassmorphism Window with Skeuomorphic Glass Reflection */
         .window {
-            background: var(--card-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-lg);
+            position: relative;
             width: 100%;
             max-width: 480px;
-            padding: 28px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(200, 230, 255, 0.25) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+            border-right-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 20px 40px rgba(0, 20, 50, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.9),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
+            overflow: hidden;
         }
 
-        /* Top Segmented Picker */
+        /* Top Window Gloss Overlay */
+        .window::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 45%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 15px 15px 100% 100% / 15px 15px 30px 30px;
+            pointer-events: none;
+        }
+
+        /* Window Header Bar */
+        .window-titlebar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .window-titlebar h1 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0b3c5d;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Aero Window Controls (Minimize, Maximize, Close) */
+        .window-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .win-btn {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8), 0 1px 2px rgba(0, 0, 0, 0.15);
+        }
+
+        .win-btn.close { background: linear-gradient(180deg, #ff7b7b 0%, #e62e2e 100%); }
+        .win-btn.min { background: linear-gradient(180deg, #ffdd7b 0%, #e6a12e 100%); }
+        .win-btn.max { background: linear-gradient(180deg, #7bff8a 0%, #2ee64d 100%); }
+
+        /* Gel Segmented Picker Tabs */
         .tab-picker {
             display: flex;
-            background: rgba(0, 0, 0, 0.04);
-            border-radius: var(--radius-md);
+            background: rgba(0, 30, 60, 0.15);
+            border-radius: 20px;
             padding: 3px;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .tab-picker {
-                background: rgba(255, 255, 255, 0.08);
-            }
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25), 0 1px 1px rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 1;
         }
 
         .tab-btn {
@@ -84,70 +144,94 @@
             padding: 8px 0;
             border: none;
             background: transparent;
-            color: var(--text-secondary);
+            color: #1c4e73;
             font-family: inherit;
             font-size: 13px;
-            font-weight: 500;
-            border-radius: var(--radius-sm);
+            font-weight: 700;
+            border-radius: 16px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
         .tab-btn.active {
-            background: var(--card-bg);
-            color: var(--text-primary);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            color: #002b49;
+            background: linear-gradient(180deg, #ffffff 0%, #dbeeff 50%, #badaff 51%, #edf5ff 100%);
+            box-shadow: 
+                0 2px 5px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
-        /* Controls Grid */
+        /* Skeuomorphic Controls Grid */
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .control-item {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         label {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 800;
+            color: #0d4b75;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
         }
 
         select, input[type="number"] {
             font-family: inherit;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 10px 12px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--card-border);
-            background-color: rgba(0, 0, 0, 0.02);
-            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 7px 10px;
+            border-radius: 8px;
+            border: 1px solid #7ea3c4;
+            background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 50%, #dbeaff 51%, #eaf3ff 100%);
+            color: #0b3a5d;
             outline: none;
-            appearance: none;
-            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 #ffffff;
+            cursor: pointer;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         select:focus, input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+            border-color: #0088ff;
+            box-shadow: 0 0 6px rgba(0, 136, 255, 0.6), inset 0 1px 0 #ffffff;
         }
 
-        /* 3D Canvas Stage */
+        /* 3D Canvas Stage Container (Engraved felt/glass tray) */
         #canvas-stage {
             width: 100%;
-            height: 200px;
-            border-radius: var(--radius-md);
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid var(--card-border);
+            height: 190px;
+            border-radius: 12px;
+            background: radial-gradient(circle, #215e47 0%, #0d3828 100%);
+            border: 2px solid #5a83a8;
+            box-shadow: 
+                inset 0 4px 12px rgba(0, 0, 0, 0.6),
+                inset 0 0 20px rgba(0, 0, 0, 0.4),
+                0 1px 2px rgba(255, 255, 255, 0.8);
             overflow: hidden;
             position: relative;
+        }
+
+        /* Subtle glare on canvas */
+        #canvas-stage::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
         }
 
         canvas {
@@ -156,38 +240,56 @@
             display: block;
         }
 
-        /* Action Button */
+        /* Frutiger Aero Gel Launch Button */
         button.primary-btn {
             font-family: inherit;
             font-size: 15px;
-            font-weight: 500;
-            background-color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 0.5px;
             color: #ffffff;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 12px 20px;
+            text-shadow: 0 -1px 2px rgba(0, 50, 0, 0.6), 0 1px 1px rgba(0, 0, 0, 0.3);
+            border: 1px solid #1e7025;
+            border-radius: 25px;
+            padding: 12px 24px;
             cursor: pointer;
             width: 100%;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            background: linear-gradient(180deg, #a3f360 0%, #51c419 49%, #3aa30d 50%, #58cc1a 100%);
+            box-shadow: 
+                0 4px 10px rgba(0, 80, 0, 0.35),
+                inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                inset 0 -2px 4px rgba(0, 50, 0, 0.3);
+            transition: all 0.15s ease;
+            position: relative;
+            z-index: 1;
         }
 
         button.primary-btn:hover {
-            background-color: var(--accent-hover);
+            background: linear-gradient(180deg, #b5f778 0%, #60d426 49%, #44b513 50%, #68dc27 100%);
+            box-shadow: 
+                0 6px 14px rgba(0, 100, 0, 0.45),
+                inset 0 1px 2px rgba(255, 255, 255, 0.9);
         }
 
         button.primary-btn:active {
-            transform: scale(0.98);
+            transform: translateY(1px);
+            background: linear-gradient(180deg, #3aa30d 0%, #51c419 100%);
+            box-shadow: inset 0 2px 6px rgba(0, 40, 0, 0.6);
         }
 
-        /* Results Board */
+        /* Skeuomorphic Glass Scoreboard */
         .score-board {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: rgba(0, 0, 0, 0.02);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            padding: 16px 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(220,240,255,0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 12px 18px;
+            box-shadow: 
+                inset 0 1px 3px rgba(255, 255, 255, 0.8),
+                0 2px 6px rgba(0, 20, 50, 0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .score-item {
@@ -197,45 +299,61 @@
 
         .score-value {
             font-size: 26px;
-            font-weight: 600;
-            letter-spacing: -0.02em;
+            font-weight: 800;
+            color: #004b7a;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 4px rgba(0, 0, 0, 0.15);
         }
 
         .score-label {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 800;
+            color: #4b7899;
             text-transform: uppercase;
         }
 
-        /* History Log Drawer */
+        /* History Drawer Log */
         .history-list {
-            max-height: 100px;
+            max-height: 90px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
+            position: relative;
+            z-index: 1;
         }
 
         .history-entry {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
-            padding: 6px 10px;
-            background-color: rgba(0, 0, 0, 0.02);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            color: #124163;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
         }
 
         .history-entry strong {
-            color: var(--text-primary);
+            color: #002b49;
         }
     </style>
 </head>
 <body>
 
     <div class="window">
-        <!-- Game Switcher Tab -->
+        <!-- Aero Window Header -->
+        <div class="window-titlebar">
+            <h1>🎲 Studio Randomization</h1>
+            <div class="window-buttons">
+                <div class="win-btn min"></div>
+                <div class="win-btn max"></div>
+                <div class="win-btn close"></div>
+            </div>
+        </div>
+
+        <!-- Gel Segmented Picker Tab -->
         <div class="tab-picker">
             <button id="tab-dice" class="tab-btn active" onclick="switchGame('dice')">🎲 Kostky 3D</button>
             <button id="tab-coin" class="tab-btn" onclick="switchGame('coin')">🪙 Mince 3D</button>
@@ -254,9 +372,9 @@
             <div class="control-item">
                 <label for="dice-color">Barva</label>
                 <select id="dice-color" onchange="setup3DStage()">
-                    <option value="0xffffff">Bílá</option>
-                    <option value="0x1d1d1f">Tmavá</option>
-                    <option value="0x0071e3">Modrá</option>
+                    <option value="0xffffff">Bílá Slonovina</option>
+                    <option value="0x111111">Černý Lesk</option>
+                    <option value="0x0088ff">Rubínově Modrá</option>
                 </select>
             </div>
             <div class="control-item">
@@ -270,30 +388,31 @@
             <div class="control-item">
                 <label for="coin-type">Typ Mince</label>
                 <select id="coin-type" onchange="setup3DStage()">
-                    <option value="gold">Zlatá Koruna</option>
-                    <option value="silver">Stříbrná Mince</option>
+                    <option value="gold">Zlaté Dukát</option>
+                    <option value="silver">Stříbrný Tolar</option>
                 </select>
             </div>
         </div>
 
-        <!-- Interactive 3D Canvas Stage -->
+        <!-- 3D Canvas Felt Tray Stage -->
         <div id="canvas-stage"></div>
 
-        <button id="action-btn" class="primary-btn" onclick="triggerAction()">Hodit kostkou</button>
+        <!-- Frutiger Aero Green Gel Roll Button -->
+        <button id="action-btn" class="primary-btn" onclick="triggerAction()">HODIT KOSTKOU</button>
 
-        <!-- Dynamic Results Panel -->
+        <!-- Glass Score Panel -->
         <div class="score-board">
             <div class="score-item">
                 <span id="result-val" class="score-value">-</span>
                 <span id="result-lbl" class="score-label">Výsledek</span>
             </div>
             <div class="score-item" style="text-align: right;">
-                <span id="action-count" class="score-value" style="font-size: 18px; color: var(--text-secondary);">0</span>
-                <span id="action-lbl" class="score-label">Hody</span>
+                <span id="action-count" class="score-value" style="font-size: 20px; color: #3b749c;">0</span>
+                <span id="action-lbl" class="score-label">Celkem Hodů</span>
             </div>
         </div>
 
-        <!-- History -->
+        <!-- History Log Drawer -->
         <div id="history-list" class="history-list"></div>
     </div>
 
@@ -303,11 +422,11 @@
         let lastRawResult = 0;
         let isAnimating = false;
 
-        // Three.js Scene Variables
+        // Three.js Core Variables
         let scene, camera, renderer, objects = [];
         const canvasStage = document.getElementById('canvas-stage');
 
-        // Audio Context
+        // Synthesized Audio via Web Audio API
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playBounceSound() {
@@ -316,16 +435,16 @@
             const gain = audioCtx.createGain();
 
             osc.type = currentGame === 'dice' ? 'sine' : 'triangle';
-            osc.frequency.setValueAtTime(currentGame === 'dice' ? 220 : 600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.1);
+            osc.frequency.setValueAtTime(currentGame === 'dice' ? 240 : 680, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(70, audioCtx.currentTime + 0.12);
 
-            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
 
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
+            osc.stop(audioCtx.currentTime + 0.12);
         }
 
         function initThree() {
@@ -340,19 +459,19 @@
             renderer.shadowMap.enabled = true;
             canvasStage.appendChild(renderer.domElement);
 
-            // Lighting Setup
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            // Lighting tailored for realistic specular highlights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
             scene.add(ambientLight);
 
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(5, 10, 7);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+            dirLight.position.set(5, 8, 6);
             scene.add(dirLight);
 
             setup3DStage();
             animate();
         }
 
-        // Texture generators for realistic 3D Dice faces
+        // Texture generators for 3D Dice faces with glossy look
         function createDiceTextures(baseColorHex) {
             const textures = [];
             const pipPositions = {
@@ -370,17 +489,17 @@
                 canvas.height = 256;
                 const ctx = canvas.getContext('2d');
 
-                // Card background
+                // Face background
                 ctx.fillStyle = baseColorHex;
                 ctx.fillRect(0, 0, 256, 256);
 
-                // Border outline
-                ctx.strokeStyle = 'rgba(0,0,0,0.08)';
-                ctx.lineWidth = 8;
+                // Subtle inner bezel shadow
+                ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+                ctx.lineWidth = 10;
                 ctx.strokeRect(0, 0, 256, 256);
 
                 // Draw pips
-                ctx.fillStyle = baseColorHex === '#1d1d1f' ? '#ffffff' : '#1d1d1f';
+                ctx.fillStyle = baseColorHex === '#111111' ? '#ffffff' : '#111111';
                 pipPositions[i].forEach(([x, y]) => {
                     ctx.beginPath();
                     ctx.arc(x * 256, y * 256, 18, 0, Math.PI * 2);
@@ -398,17 +517,19 @@
             canvas.height = 256;
             const ctx = canvas.getContext('2d');
 
-            ctx.fillStyle = document.getElementById('coin-type').value === 'gold' ? '#eab308' : '#94a3b8';
+            const isGold = document.getElementById('coin-type').value === 'gold';
+            ctx.fillStyle = isGold ? '#f39c12' : '#bdc3c7';
             ctx.fillRect(0, 0, 256, 256);
 
-            ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-            ctx.lineWidth = 12;
+            // Metallic rim pattern
+            ctx.strokeStyle = isGold ? '#d35400' : '#7f8c8d';
+            ctx.lineWidth = 14;
             ctx.beginPath();
             ctx.arc(128, 128, 110, 0, Math.PI * 2);
             ctx.stroke();
 
-            ctx.fillStyle = '#1d1d1f';
-            ctx.font = 'bold 80px sans-serif';
+            ctx.fillStyle = '#111111';
+            ctx.font = 'bold 85px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(label, 128, 128);
@@ -417,7 +538,6 @@
         }
 
         function setup3DStage() {
-            // Clear existing objects
             objects.forEach(obj => scene.remove(obj));
             objects = [];
 
@@ -428,16 +548,15 @@
                 const textures = createDiceTextures(hexStr);
 
                 const materials = [
-                    new THREE.MeshStandardMaterial({ map: textures[0] }), // Right: 1
-                    new THREE.MeshStandardMaterial({ map: textures[5] }), // Left: 6
-                    new THREE.MeshStandardMaterial({ map: textures[1] }), // Top: 2
-                    new THREE.MeshStandardMaterial({ map: textures[4] }), // Bottom: 5
-                    new THREE.MeshStandardMaterial({ map: textures[2] }), // Front: 3
-                    new THREE.MeshStandardMaterial({ map: textures[3] })  // Back: 4
+                    new THREE.MeshStandardMaterial({ map: textures[0], roughness: 0.2, metalness: 0.1 }),
+                    new THREE.MeshStandardMaterial({ map: textures[5], roughness: 0.2, metalness: 0.1 }),
+                    new THREE.MeshStandardMaterial({ map: textures[1], roughness: 0.2, metalness: 0.1 }),
+                    new THREE.MeshStandardMaterial({ map: textures[4], roughness: 0.2, metalness: 0.1 }),
+                    new THREE.MeshStandardMaterial({ map: textures[2], roughness: 0.2, metalness: 0.1 }),
+                    new THREE.MeshStandardMaterial({ map: textures[3], roughness: 0.2, metalness: 0.1 })
                 ];
 
                 const geometry = new THREE.BoxGeometry(1.2, 1.2, 1.2);
-
                 const offsets = count === 1 ? [0] : count === 2 ? [-0.9, 0.9] : [-1.5, 0, 1.5];
 
                 for (let i = 0; i < count; i++) {
@@ -447,14 +566,13 @@
                     objects.push(cube);
                 }
             } else {
-                // Coin mode
                 const headsTex = createCoinTexture('H');
                 const tailsTex = createCoinTexture('O');
 
                 const materials = [
-                    new THREE.MeshStandardMaterial({ color: 0xc0c0c0 }), // Edge
-                    new THREE.MeshStandardMaterial({ map: headsTex }),   // Front
-                    new THREE.MeshStandardMaterial({ map: tailsTex })    // Back
+                    new THREE.MeshStandardMaterial({ color: 0xd0d0d0, metalness: 0.8, roughness: 0.2 }),
+                    new THREE.MeshStandardMaterial({ map: headsTex, metalness: 0.5, roughness: 0.3 }),
+                    new THREE.MeshStandardMaterial({ map: tailsTex, metalness: 0.5, roughness: 0.3 })
                 ];
 
                 const geometry = new THREE.CylinderGeometry(1.2, 1.2, 0.15, 32);
@@ -476,7 +594,6 @@
                 let totalSum = 0;
                 let results = [];
 
-                // Face rotations map for D6
                 const targetRotations = {
                     1: { x: 0, y: -Math.PI / 2 },
                     6: { x: 0, y: Math.PI / 2 },
@@ -504,7 +621,7 @@
                     function animateCube(timestamp) {
                         if (!startTime) startTime = timestamp;
                         const progress = Math.min((timestamp - startTime) / 800, 1);
-                        const ease = 1 - Math.pow(1 - progress, 3); // Out cubic easing
+                        const ease = 1 - Math.pow(1 - progress, 3);
 
                         cube.rotation.x = startRotX + (endRotX - startRotX) * ease;
                         cube.rotation.y = startRotY + (endRotY - startRotY) * ease;
@@ -525,7 +642,6 @@
                 }, 800);
 
             } else {
-                // Coin flip logic
                 const isHeads = Math.random() < 0.5;
                 const coin = objects[0];
 
@@ -541,7 +657,7 @@
                     const ease = 1 - Math.pow(1 - progress, 3);
 
                     coin.rotation.x = startRotX + (targetRotX - startRotX) * ease;
-                    coin.position.y = Math.sin(progress * Math.PI) * 1.5; // Upward hop animation
+                    coin.position.y = Math.sin(progress * Math.PI) * 1.5;
 
                     if (progress < 1) {
                         requestAnimationFrame(animateCoin);
@@ -588,7 +704,7 @@
             document.getElementById('dice-controls').style.display = mode === 'dice' ? 'grid' : 'none';
             document.getElementById('coin-controls').style.display = mode === 'coin' ? 'grid' : 'none';
 
-            document.getElementById('action-btn').innerText = mode === 'dice' ? 'Hodit kostkou' : 'Hodit mincí';
+            document.getElementById('action-btn').innerText = mode === 'dice' ? 'HODIT KOSTKOU' : 'HODIT MINCÍ';
             document.getElementById('result-val').innerText = '-';
 
             setup3DStage();
@@ -601,7 +717,7 @@
 
         window.addEventListener('resize', () => {
             camera.aspect = canvasStage.clientWidth / canvasStage.clientHeight;
-            camera.updateProjectionMatrix();
+            camera.updateToggleMatrix?.() || camera.updateProjectionMatrix();
             renderer.setSize(canvasStage.clientWidth, canvasStage.clientHeight);
         });
 
