@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kostky</title>
+    <title>Studio Randomization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
             --bg: #f5f5f7;
-            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.85);
             --card-border: rgba(0, 0, 0, 0.08);
             --text-primary: #1d1d1f;
             --text-secondary: #86868b;
             --accent: #0071e3;
             --accent-hover: #0077ed;
-            --dice-bg: #ffffff;
-            --dice-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
-            --pip-color: #1d1d1f;
             --radius-lg: 20px;
             --radius-md: 12px;
             --radius-sm: 8px;
@@ -24,15 +22,12 @@
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #000000;
-                --card-bg: rgba(28, 28, 30, 0.8);
+                --card-bg: rgba(28, 28, 30, 0.85);
                 --card-border: rgba(255, 255, 255, 0.12);
                 --text-primary: #f5f5f7;
                 --text-secondary: #86868b;
                 --accent: #2997ff;
                 --accent-hover: #3b9eff;
-                --dice-bg: #2c2c2e;
-                --dice-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
-                --pip-color: #f5f5f7;
             }
         }
 
@@ -51,57 +46,57 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 20px;
             -webkit-font-smoothing: antialiased;
         }
 
         .window {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 440px;
-            padding: 32px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+            max-width: 480px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
-            gap: 28px;
+            gap: 20px;
         }
 
-        header {
+        /* Top Segmented Picker */
+        .tab-picker {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: var(--radius-md);
+            padding: 3px;
         }
 
-        h1 {
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: -0.01em;
+        @media (prefers-color-scheme: dark) {
+            .tab-picker {
+                background: rgba(255, 255, 255, 0.08);
+            }
         }
 
-        .icon-btn {
-            background: transparent;
+        .tab-btn {
+            flex: 1;
+            padding: 8px 0;
             border: none;
+            background: transparent;
             color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.15s, background-color 0.15s;
+            transition: all 0.2s ease;
         }
 
-        .icon-btn:hover {
+        .tab-btn.active {
+            background: var(--card-bg);
             color: var(--text-primary);
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .icon-btn.active {
-            color: var(--accent);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         /* Controls Grid */
@@ -144,85 +139,21 @@
             box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
         }
 
-        /* Playground */
-        .stage {
-            min-height: 140px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            padding: 10px 0;
-            perspective: 800px;
+        /* 3D Canvas Stage */
+        #canvas-stage {
+            width: 100%;
+            height: 200px;
+            border-radius: var(--radius-md);
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            position: relative;
         }
 
-        /* 3D Cube */
-        .scene {
-            width: 72px;
-            height: 72px;
-            perspective: 400px;
-        }
-
-        .cube {
+        canvas {
             width: 100%;
             height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .cube-face {
-            position: absolute;
-            width: 72px;
-            height: 72px;
-            background: var(--dice-bg);
-            border-radius: var(--radius-md);
-            box-shadow: var(--dice-shadow);
-            display: grid;
-            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-            padding: 8px;
-            box-sizing: border-box;
-        }
-
-        .pip {
             display: block;
-            background-color: var(--pip-color);
-            border-radius: 50%;
-            align-self: center;
-            justify-self: center;
-            width: 10px;
-            height: 10px;
-        }
-
-        .face-1 { transform: rotateY(0deg) translateZ(36px); }
-        .face-2 { transform: rotateY(90deg) translateZ(36px); }
-        .face-3 { transform: rotateX(-90deg) translateZ(36px); }
-        .face-4 { transform: rotateX(90deg) translateZ(36px); }
-        .face-5 { transform: rotateY(-90deg) translateZ(36px); }
-        .face-6 { transform: rotateY(180deg) translateZ(36px); }
-
-        .pip:nth-child(1) { grid-area: 1 / 1; }
-        .pip:nth-child(2) { grid-area: 1 / 3; }
-        .pip:nth-child(3) { grid-area: 2 / 2; }
-        .pip:nth-child(4) { grid-area: 3 / 1; }
-        .pip:nth-child(5) { grid-area: 3 / 3; }
-        .pip:nth-child(6) { grid-area: 2 / 1; }
-        .pip:nth-child(7) { grid-area: 2 / 3; }
-
-        /* Polyhedral Dice Display */
-        .poly-dice {
-            width: 72px;
-            height: 72px;
-            background: var(--dice-bg);
-            border-radius: var(--radius-md);
-            box-shadow: var(--dice-shadow);
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 600;
-            transition: transform 0.4s ease;
         }
 
         /* Action Button */
@@ -265,7 +196,7 @@
         }
 
         .score-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 600;
             letter-spacing: -0.02em;
         }
@@ -277,26 +208,20 @@
             text-transform: uppercase;
         }
 
-        /* History Drawer */
-        .history-drawer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
+        /* History Log Drawer */
+        .history-list {
+            max-height: 100px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-        }
-
-        .history-drawer.open {
-            max-height: 150px;
-            overflow-y: auto;
+            gap: 6px;
         }
 
         .history-entry {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            padding: 8px 12px;
+            font-size: 12px;
+            padding: 6px 10px;
             background-color: rgba(0, 0, 0, 0.02);
             border-radius: var(--radius-sm);
             color: var(--text-secondary);
@@ -310,224 +235,377 @@
 <body>
 
     <div class="window">
-        <header>
-            <h1>Kostky</h1>
-            <div style="display: flex; gap: 4px;">
-                <button id="sound-toggle" class="icon-btn active" title="Zvuk" onclick="toggleAudio()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                </button>
-                <button class="icon-btn" title="Historie" onclick="toggleHistory()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                </button>
-            </div>
-        </header>
+        <!-- Game Switcher Tab -->
+        <div class="tab-picker">
+            <button id="tab-dice" class="tab-btn active" onclick="switchGame('dice')">🎲 Kostky 3D</button>
+            <button id="tab-coin" class="tab-btn" onclick="switchGame('coin')">🪙 Mince 3D</button>
+        </div>
 
-        <div class="controls">
+        <!-- Dice Mode Controls -->
+        <div id="dice-controls" class="controls">
             <div class="control-item">
                 <label for="dice-count">Počet</label>
-                <select id="dice-count" onchange="setupDice()">
+                <select id="dice-count" onchange="setup3DStage()">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
-                    <option value="4">4</option>
                 </select>
             </div>
-
             <div class="control-item">
-                <label for="dice-type">Typ</label>
-                <select id="dice-type" onchange="setupDice()">
-                    <option value="6">D6</option>
-                    <option value="4">D4</option>
-                    <option value="8">D8</option>
-                    <option value="10">D10</option>
-                    <option value="12">D12</option>
-                    <option value="20">D20</option>
+                <label for="dice-color">Barva</label>
+                <select id="dice-color" onchange="setup3DStage()">
+                    <option value="0xffffff">Bílá</option>
+                    <option value="0x1d1d1f">Tmavá</option>
+                    <option value="0x0071e3">Modrá</option>
                 </select>
             </div>
-
             <div class="control-item">
                 <label for="modifier">Bonus (+/-)</label>
-                <input type="number" id="modifier" value="0" step="1" onchange="updateTotalDisplay()">
+                <input type="number" id="modifier" value="0" step="1" onchange="updateScoreDisplay()">
             </div>
         </div>
 
-        <div id="stage" class="stage"></div>
+        <!-- Coin Mode Controls -->
+        <div id="coin-controls" class="controls" style="display: none; grid-template-columns: 1fr;">
+            <div class="control-item">
+                <label for="coin-type">Typ Mince</label>
+                <select id="coin-type" onchange="setup3DStage()">
+                    <option value="gold">Zlatá Koruna</option>
+                    <option value="silver">Stříbrná Mince</option>
+                </select>
+            </div>
+        </div>
 
-        <button class="primary-btn" onclick="rollAll()">Hodit</button>
+        <!-- Interactive 3D Canvas Stage -->
+        <div id="canvas-stage"></div>
 
+        <button id="action-btn" class="primary-btn" onclick="triggerAction()">Hodit kostkou</button>
+
+        <!-- Dynamic Results Panel -->
         <div class="score-board">
             <div class="score-item">
-                <span id="total-val" class="score-value">0</span>
-                <span class="score-label">Výsledek</span>
+                <span id="result-val" class="score-value">-</span>
+                <span id="result-lbl" class="score-label">Výsledek</span>
             </div>
             <div class="score-item" style="text-align: right;">
-                <span id="rolls-count" class="score-value" style="font-size: 18px; color: var(--text-secondary);">0</span>
-                <span class="score-label">Hody</span>
+                <span id="action-count" class="score-value" style="font-size: 18px; color: var(--text-secondary);">0</span>
+                <span id="action-lbl" class="score-label">Hody</span>
             </div>
         </div>
 
-        <div id="history-drawer" class="history-drawer"></div>
+        <!-- History -->
+        <div id="history-list" class="history-list"></div>
     </div>
 
     <script>
+        let currentGame = 'dice';
         let rollCounter = 0;
-        let lastRollBaseSum = 0;
-        let soundEnabled = true;
-        let audioCtx = null;
+        let lastRawResult = 0;
+        let isAnimating = false;
 
-        const rotations = {
-            1: { x: 0,   y: 0 },
-            2: { x: 0,   y: -90 },
-            3: { x: 90,  y: 0 },
-            4: { x: -90, y: 0 },
-            5: { x: 0,   y: 90 },
-            6: { x: 0,   y: 180 }
-        };
+        // Three.js Scene Variables
+        let scene, camera, renderer, objects = [];
+        const canvasStage = document.getElementById('canvas-stage');
 
-        function playSoftClick() {
-            if (!soundEnabled) return;
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Audio Context
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playBounceSound() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
 
-            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+            osc.type = currentGame === 'dice' ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(currentGame === 'dice' ? 220 : 600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.1);
+
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
 
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.08);
+            osc.stop(audioCtx.currentTime + 0.1);
         }
 
-        function toggleAudio() {
-            soundEnabled = !soundEnabled;
-            document.getElementById('sound-toggle').classList.toggle('active', soundEnabled);
+        function initThree() {
+            scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera(45, canvasStage.clientWidth / canvasStage.clientHeight, 0.1, 100);
+            camera.position.set(0, 0, 7);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(canvasStage.clientWidth, canvasStage.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            canvasStage.appendChild(renderer.domElement);
+
+            // Lighting Setup
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(5, 10, 7);
+            scene.add(dirLight);
+
+            setup3DStage();
+            animate();
         }
 
-        function toggleHistory() {
-            document.getElementById('history-drawer').classList.toggle('open');
+        // Texture generators for realistic 3D Dice faces
+        function createDiceTextures(baseColorHex) {
+            const textures = [];
+            const pipPositions = {
+                1: [[0.5, 0.5]],
+                2: [[0.25, 0.25], [0.75, 0.75]],
+                3: [[0.25, 0.25], [0.5, 0.5], [0.75, 0.75]],
+                4: [[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]],
+                5: [[0.25, 0.25], [0.75, 0.25], [0.5, 0.5], [0.25, 0.75], [0.75, 0.75]],
+                6: [[0.25, 0.25], [0.75, 0.25], [0.25, 0.5], [0.75, 0.5], [0.25, 0.75], [0.75, 0.75]]
+            };
+
+            for (let i = 1; i <= 6; i++) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 256;
+                canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+
+                // Card background
+                ctx.fillStyle = baseColorHex;
+                ctx.fillRect(0, 0, 256, 256);
+
+                // Border outline
+                ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+                ctx.lineWidth = 8;
+                ctx.strokeRect(0, 0, 256, 256);
+
+                // Draw pips
+                ctx.fillStyle = baseColorHex === '#1d1d1f' ? '#ffffff' : '#1d1d1f';
+                pipPositions[i].forEach(([x, y]) => {
+                    ctx.beginPath();
+                    ctx.arc(x * 256, y * 256, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                textures.push(new THREE.CanvasTexture(canvas));
+            }
+            return textures;
         }
 
-        function createCubeElement() {
-            const scene = document.createElement('div');
-            scene.className = 'scene';
-            scene.innerHTML = `
-                <div class="cube" data-x="0" data-y="0">
-                    <div class="cube-face face-1"><span class="pip"></span></div>
-                    <div class="cube-face face-2"><span class="pip"></span><span class="pip"></span></div>
-                    <div class="cube-face face-3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                    <div class="cube-face face-4"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                    <div class="cube-face face-5"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                    <div class="cube-face face-6"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                </div>
-            `;
-            return scene;
+        function createCoinTexture(label) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = document.getElementById('coin-type').value === 'gold' ? '#eab308' : '#94a3b8';
+            ctx.fillRect(0, 0, 256, 256);
+
+            ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+            ctx.lineWidth = 12;
+            ctx.beginPath();
+            ctx.arc(128, 128, 110, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1d1d1f';
+            ctx.font = 'bold 80px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, 128, 128);
+
+            return new THREE.CanvasTexture(canvas);
         }
 
-        function setupDice() {
-            const stage = document.getElementById('stage');
-            const count = parseInt(document.getElementById('dice-count').value, 10);
-            const type = parseInt(document.getElementById('dice-type').value, 10);
+        function setup3DStage() {
+            // Clear existing objects
+            objects.forEach(obj => scene.remove(obj));
+            objects = [];
 
-            stage.innerHTML = '';
+            if (currentGame === 'dice') {
+                const count = parseInt(document.getElementById('dice-count').value, 10);
+                const colorHex = document.getElementById('dice-color').value;
+                const hexStr = '#' + parseInt(colorHex).toString(16).padStart(6, '0');
+                const textures = createDiceTextures(hexStr);
 
-            for (let i = 0; i < count; i++) {
-                if (type === 6) {
-                    stage.appendChild(createCubeElement());
-                } else {
-                    const poly = document.createElement('div');
-                    poly.className = 'poly-dice';
-                    poly.innerText = '-';
-                    stage.appendChild(poly);
+                const materials = [
+                    new THREE.MeshStandardMaterial({ map: textures[0] }), // Right: 1
+                    new THREE.MeshStandardMaterial({ map: textures[5] }), // Left: 6
+                    new THREE.MeshStandardMaterial({ map: textures[1] }), // Top: 2
+                    new THREE.MeshStandardMaterial({ map: textures[4] }), // Bottom: 5
+                    new THREE.MeshStandardMaterial({ map: textures[2] }), // Front: 3
+                    new THREE.MeshStandardMaterial({ map: textures[3] })  // Back: 4
+                ];
+
+                const geometry = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+
+                const offsets = count === 1 ? [0] : count === 2 ? [-0.9, 0.9] : [-1.5, 0, 1.5];
+
+                for (let i = 0; i < count; i++) {
+                    const cube = new THREE.Mesh(geometry, materials);
+                    cube.position.x = offsets[i];
+                    scene.add(cube);
+                    objects.push(cube);
                 }
-            }
-        }
-
-        function updateTotalDisplay() {
-            const modifier = parseInt(document.getElementById('modifier').value, 10) || 0;
-            const finalTotal = lastRollBaseSum + modifier;
-            document.getElementById('total-val').innerText = lastRollBaseSum > 0 ? finalTotal : 0;
-        }
-
-        function rollAll() {
-            playSoftClick();
-            
-            const type = parseInt(document.getElementById('dice-type').value, 10);
-            const stage = document.getElementById('stage');
-            let baseSum = 0;
-            let individualResults = [];
-
-            if (type === 6) {
-                const cubes = stage.querySelectorAll('.cube');
-                cubes.forEach(cube => {
-                    const val = Math.floor(Math.random() * 6) + 1;
-                    baseSum += val;
-                    individualResults.push(val);
-
-                    let currentX = parseInt(cube.getAttribute('data-x'), 10) || 0;
-                    let currentY = parseInt(cube.getAttribute('data-y'), 10) || 0;
-                    const target = rotations[val];
-
-                    let nextX = currentX + 720 + (target.x - (currentX % 360));
-                    let nextY = currentY + 720 + (target.y - (currentY % 360));
-
-                    cube.style.transform = `rotateX(${nextX}deg) rotateY(${nextY}deg)`;
-                    cube.setAttribute('data-x', nextX);
-                    cube.setAttribute('data-y', nextY);
-                });
             } else {
-                const polyDice = stage.querySelectorAll('.poly-dice');
-                polyDice.forEach(dice => {
-                    const val = Math.floor(Math.random() * type) + 1;
-                    baseSum += val;
-                    individualResults.push(val);
+                // Coin mode
+                const headsTex = createCoinTexture('H');
+                const tailsTex = createCoinTexture('O');
 
-                    dice.style.transform = 'scale(0.92)';
-                    setTimeout(() => {
-                        dice.innerText = val;
-                        dice.style.transform = 'scale(1)';
-                    }, 120);
-                });
+                const materials = [
+                    new THREE.MeshStandardMaterial({ color: 0xc0c0c0 }), // Edge
+                    new THREE.MeshStandardMaterial({ map: headsTex }),   // Front
+                    new THREE.MeshStandardMaterial({ map: tailsTex })    // Back
+                ];
+
+                const geometry = new THREE.CylinderGeometry(1.2, 1.2, 0.15, 32);
+                const coin = new THREE.Mesh(geometry, materials);
+                coin.rotation.x = Math.PI / 2;
+                scene.add(coin);
+                objects.push(coin);
             }
+        }
 
-            lastRollBaseSum = baseSum;
+        function triggerAction() {
+            if (isAnimating) return;
+            isAnimating = true;
+            playBounceSound();
+
             rollCounter++;
 
-            setTimeout(() => {
-                updateTotalDisplay();
-                document.getElementById('rolls-count').innerText = rollCounter;
-                
-                // Add to history drawer
-                const historyDrawer = document.getElementById('history-drawer');
-                const entry = document.createElement('div');
-                entry.className = 'history-entry';
-                const modifier = parseInt(document.getElementById('modifier').value, 10) || 0;
-                const modStr = modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : '';
-                entry.innerHTML = `<span>Hod #${rollCounter} [${individualResults.join(', ')}]${modStr}</span><strong>${baseSum + modifier}</strong>`;
-                historyDrawer.prepend(entry);
-            }, 250);
+            if (currentGame === 'dice') {
+                let totalSum = 0;
+                let results = [];
+
+                // Face rotations map for D6
+                const targetRotations = {
+                    1: { x: 0, y: -Math.PI / 2 },
+                    6: { x: 0, y: Math.PI / 2 },
+                    2: { x: -Math.PI / 2, y: 0 },
+                    5: { x: Math.PI / 2, y: 0 },
+                    3: { x: 0, y: 0 },
+                    4: { x: 0, y: Math.PI }
+                };
+
+                objects.forEach((cube) => {
+                    const val = Math.floor(Math.random() * 6) + 1;
+                    totalSum += val;
+                    results.push(val);
+
+                    const target = targetRotations[val];
+                    const spinsX = (Math.floor(Math.random() * 2) + 2) * Math.PI * 2;
+                    const spinsY = (Math.floor(Math.random() * 2) + 2) * Math.PI * 2;
+
+                    const startRotX = cube.rotation.x;
+                    const startRotY = cube.rotation.y;
+                    const endRotX = target.x + spinsX;
+                    const endRotY = target.y + spinsY;
+
+                    let startTime = null;
+                    function animateCube(timestamp) {
+                        if (!startTime) startTime = timestamp;
+                        const progress = Math.min((timestamp - startTime) / 800, 1);
+                        const ease = 1 - Math.pow(1 - progress, 3); // Out cubic easing
+
+                        cube.rotation.x = startRotX + (endRotX - startRotX) * ease;
+                        cube.rotation.y = startRotY + (endRotY - startRotY) * ease;
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animateCube);
+                        } else {
+                            isAnimating = false;
+                        }
+                    }
+                    requestAnimationFrame(animateCube);
+                });
+
+                lastRawResult = totalSum;
+                setTimeout(() => {
+                    updateScoreDisplay();
+                    logHistory(`Hod #${rollCounter} [${results.join(', ')}]`, getFinalResult());
+                }, 800);
+
+            } else {
+                // Coin flip logic
+                const isHeads = Math.random() < 0.5;
+                const coin = objects[0];
+
+                const spins = (Math.floor(Math.random() * 3) + 4) * Math.PI;
+                const targetRotX = isHeads ? spins : spins + Math.PI;
+
+                const startRotX = coin.rotation.x;
+                let startTime = null;
+
+                function animateCoin(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / 1000, 1);
+                    const ease = 1 - Math.pow(1 - progress, 3);
+
+                    coin.rotation.x = startRotX + (targetRotX - startRotX) * ease;
+                    coin.position.y = Math.sin(progress * Math.PI) * 1.5; // Upward hop animation
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animateCoin);
+                    } else {
+                        isAnimating = false;
+                    }
+                }
+                requestAnimationFrame(animateCoin);
+
+                setTimeout(() => {
+                    const resultText = isHeads ? 'Hlava' : 'Orel';
+                    document.getElementById('result-val').innerText = resultText;
+                    document.getElementById('action-count').innerText = rollCounter;
+                    logHistory(`Hodu #${rollCounter}`, resultText);
+                }, 1000);
+            }
         }
 
-        // Shake to roll detection for mobile
-        let lastShakeTime = 0;
-        window.addEventListener('devicemotion', (e) => {
-            const acc = e.accelerationIncludingGravity;
-            if (!acc) return;
-            const delta = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
-            if (delta > 20 && (Date.now() - lastShakeTime > 1000)) {
-                lastShakeTime = Date.now();
-                rollAll();
+        function getFinalResult() {
+            const mod = parseInt(document.getElementById('modifier').value, 10) || 0;
+            return lastRawResult + mod;
+        }
+
+        function updateScoreDisplay() {
+            if (currentGame === 'dice' && lastRawResult > 0) {
+                document.getElementById('result-val').innerText = getFinalResult();
+                document.getElementById('action-count').innerText = rollCounter;
             }
+        }
+
+        function logHistory(label, val) {
+            const list = document.getElementById('history-list');
+            const entry = document.createElement('div');
+            entry.className = 'history-entry';
+            entry.innerHTML = `<span>${label}</span><strong>${val}</strong>`;
+            list.prepend(entry);
+        }
+
+        function switchGame(mode) {
+            currentGame = mode;
+            document.getElementById('tab-dice').classList.toggle('active', mode === 'dice');
+            document.getElementById('tab-coin').classList.toggle('active', mode === 'coin');
+
+            document.getElementById('dice-controls').style.display = mode === 'dice' ? 'grid' : 'none';
+            document.getElementById('coin-controls').style.display = mode === 'coin' ? 'grid' : 'none';
+
+            document.getElementById('action-btn').innerText = mode === 'dice' ? 'Hodit kostkou' : 'Hodit mincí';
+            document.getElementById('result-val').innerText = '-';
+
+            setup3DStage();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = canvasStage.clientWidth / canvasStage.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvasStage.clientWidth, canvasStage.clientHeight);
         });
 
-        setupDice();
+        initThree();
     </script>
 </body>
 </html>
