@@ -3,141 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Kostka Studio 3D</title>
+    <title>Hrací kostka</title>
     <style>
         :root {
-            --bg-grad-1: #1a1c29;
-            --bg-grad-2: #0e1017;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --accent: #ff3366;
-            --accent-glow: rgba(255, 51, 102, 0.4);
+            --bg-color: #f4f5f7;
+            --card-bg: #ffffff;
+            --text-primary: #172b4d;
+            --text-secondary: #6b778c;
+            --border-color: #dfe1e6;
+            --accent-color: #0052cc;
+            --accent-hover: #0065ff;
             --dice-bg: #ffffff;
-            --dice-dot: #111111;
-            --text-color: #ffffff;
-        }
-
-        /* Color Schemes */
-        [data-theme="cyberpunk"] {
-            --bg-grad-1: #0f051d;
-            --bg-grad-2: #290025;
-            --accent: #00f0ff;
-            --accent-glow: rgba(0, 240, 255, 0.5);
-            --dice-bg: #120024;
-            --dice-dot: #00f0ff;
-        }
-
-        [data-theme="gold"] {
-            --bg-grad-1: #1c1917;
-            --bg-grad-2: #0c0a09;
-            --accent: #eab308;
-            --accent-glow: rgba(234, 179, 8, 0.4);
-            --dice-bg: #fef08a;
-            --dice-dot: #713f12;
+            --dice-border: #091e42;
+            --pip-color: #091e42;
         }
 
         * {
             box-sizing: border-box;
-            user-select: none;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: radial-gradient(circle at center, var(--bg-grad-1), var(--bg-grad-2));
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             min-height: 100vh;
-            margin: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
-            transition: background 0.5s ease;
+            padding: 20px;
         }
 
-        .app-container {
-            width: 90%;
-            max-width: 800px;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        .container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 480px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(9, 30, 66, 0.08);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
+            gap: 24px;
+        }
+
+        header {
+            text-align: center;
         }
 
         h1 {
-            margin: 0;
-            font-size: 2rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: linear-gradient(45deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
         }
 
-        /* Controls Panel */
+        p.subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Controls */
         .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
         }
 
         .control-group {
             display: flex;
             flex-direction: column;
-            gap: 0.3rem;
-            font-size: 0.85rem;
-            color: #aaa;
+            gap: 6px;
         }
 
-        select, button {
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        select {
             font-family: inherit;
-            font-size: 1rem;
-            padding: 0.6rem 1.2rem;
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: #fafbfc;
+            color: var(--text-primary);
             outline: none;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: border-color 0.2s, background-color 0.2s;
         }
 
-        select option {
-            background: #111;
-            color: #fff;
+        select:hover {
+            background-color: #f4f5f7;
         }
 
-        select:hover, button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: var(--accent);
+        select:focus {
+            border-color: var(--accent-color);
         }
 
-        /* Dice Playground */
+        /* Dice Display Area */
         .dice-area {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            gap: 40px;
-            min-height: 200px;
-            width: 100%;
+            gap: 24px;
+            min-height: 120px;
+            padding: 16px 0;
             perspective: 1000px;
-            padding: 20px 0;
         }
 
-        /* 3D Cube Styling */
+        /* 3D Cube */
         .scene {
             width: 80px;
             height: 80px;
-            perspective: 600px;
+            perspective: 400px;
         }
 
         .cube {
@@ -145,7 +130,7 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .cube-face {
@@ -153,51 +138,33 @@
             width: 80px;
             height: 80px;
             background: var(--dice-bg);
-            border: 2px solid rgba(0,0,0,0.1);
-            border-radius: 16px;
+            border: 2px solid var(--dice-border);
+            border-radius: 12px;
             display: grid;
             grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-            padding: 8px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.15);
+            padding: 6px;
             box-sizing: border-box;
         }
 
         .pip {
             display: block;
-            background-color: var(--dice-dot);
+            background-color: var(--pip-color);
             border-radius: 50%;
             align-self: center;
             justify-self: center;
             width: 12px;
             height: 12px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
         }
 
-        /* 3D Face Positions */
-        .face-1 { transform: rotateY(  0deg) translateZ(40px); }
-        .face-6 { transform: rotateY(180deg) translateZ(40px); }
-        .face-2 { transform: rotateY( 90deg) translateZ(40px); }
+        /* 3D Face Rotations */
+        .face-1 { transform: rotateY(0deg) translateZ(40px); }
+        .face-2 { transform: rotateY(90deg) translateZ(40px); }
+        .face-3 { transform: rotateX(-90deg) translateZ(40px); }
+        .face-4 { transform: rotateX(90deg) translateZ(40px); }
         .face-5 { transform: rotateY(-90deg) translateZ(40px); }
-        .face-3 { transform: rotateX( 90deg) translateZ(40px); }
-        .face-4 { transform: rotateX(-90deg) translateZ(40px); }
+        .face-6 { transform: rotateY(180deg) translateZ(40px); }
 
-        /* Polyhedral (D4, D8, D20 etc.) display style */
-        .poly-dice {
-            width: 80px;
-            height: 80px;
-            background: var(--dice-bg);
-            color: var(--dice-dot);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            box-shadow: 0 0 20px var(--accent-glow);
-            transition: transform 0.8s ease;
-        }
-
-        /* Pip layout alignments */
+        /* Pip Positions */
         .pip:nth-child(1) { grid-area: 1 / 1; }
         .pip:nth-child(2) { grid-area: 1 / 3; }
         .pip:nth-child(3) { grid-area: 2 / 2; }
@@ -206,261 +173,217 @@
         .pip:nth-child(6) { grid-area: 2 / 1; }
         .pip:nth-child(7) { grid-area: 2 / 3; }
 
-        /* Primary Roll Button */
-        .btn-roll {
-            background: var(--accent);
-            color: #fff;
-            font-weight: bold;
-            font-size: 1.2rem;
-            padding: 0.8rem 2.5rem;
+        /* Non-D6 Display */
+        .poly-dice {
+            width: 80px;
+            height: 80px;
+            background: var(--dice-bg);
+            border: 2px solid var(--dice-border);
+            color: var(--text-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            transition: transform 0.4s ease;
+        }
+
+        /* Primary Action Button */
+        button.btn-roll {
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            background-color: var(--accent-color);
+            color: #ffffff;
             border: none;
-            box-shadow: 0 0 15px var(--accent-glow);
+            border-radius: 6px;
+            padding: 12px 20px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
         }
 
-        .btn-roll:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px var(--accent-glow);
-            background: var(--accent);
+        button.btn-roll:hover {
+            background-color: var(--accent-hover);
         }
 
-        .btn-roll:active {
+        button.btn-roll:active {
             transform: translateY(1px);
         }
 
-        /* Results & Stats */
-        .stats-panel {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            border-top: 1px solid var(--card-border);
-            padding-top: 1rem;
+        /* Summary Output */
+        .results-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        .result-card {
+            background-color: #fafbfc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
             text-align: center;
         }
 
-        .stat-box .val {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--accent);
+        .result-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
-        .stat-box .lbl {
-            font-size: 0.75rem;
-            color: #888;
+        .result-label {
+            font-size: 11px;
+            font-weight: 600;
             text-transform: uppercase;
-        }
-
-        /* History log */
-        .history {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            max-width: 100%;
-            padding: 5px;
-        }
-
-        .history-chip {
-            background: rgba(255,255,255,0.1);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            white-space: nowrap;
+            color: var(--text-secondary);
+            margin-top: 2px;
         }
     </style>
 </head>
-<body data-theme="default">
+<body>
 
-    <div class="app-container">
-        <h1>🎲 3D Dice Studio</h1>
+    <div class="container">
+        <header>
+            <h1>Hrací kostka</h1>
+            <p class="subtitle">Generátor náhodných hodu</p>
+        </header>
 
-        <!-- Settings & Controls -->
         <div class="controls">
             <div class="control-group">
-                <label>Počet kostek</label>
+                <label for="dice-count">Počet kostek</label>
                 <select id="dice-count" onchange="setupDice()">
-                    <option value="1">1 Kostka</option>
-                    <option value="2">2 Kostky</option>
-                    <option value="3">3 Kostky</option>
-                    <option value="4">4 Kostky</option>
-                    <option value="5">5 Kostek</option>
-                    <option value="6">6 Kostek</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
                 </select>
             </div>
 
             <div class="control-group">
-                <label>Typ kostky</label>
+                <label for="dice-type">Typ kostky</label>
                 <select id="dice-type" onchange="setupDice()">
                     <option value="6">D6 (Klasická)</option>
-                    <option value="4">D4 (4-stěnná)</option>
-                    <option value="8">D8 (8-stěnná)</option>
-                    <option value="10">D10 (10-stěnná)</option>
-                    <option value="12">D12 (12-stěnná)</option>
-                    <option value="20">D20 (20-stěnná)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label>Vzhled</label>
-                <select id="theme-select" onchange="changeTheme(this.value)">
-                    <option value="default">Klasik</option>
-                    <option value="cyberpunk">Cyberpunk</option>
-                    <option value="gold">Zlatá</option>
+                    <option value="4">D4</option>
+                    <option value="8">D8</option>
+                    <option value="10">D10</option>
+                    <option value="12">D12</option>
+                    <option value="20">D20</option>
                 </select>
             </div>
         </div>
 
-        <!-- Interactive Dice Playground -->
         <div id="dice-playground" class="dice-area"></div>
 
-        <!-- Action Button -->
-        <button class="btn-roll" onclick="rollAll()">HODIT KOSTKOU</button>
+        <button class="btn-roll" onclick="rollAll()">Hodit kostkou</button>
 
-        <!-- Stats Dashboard -->
-        <div class="stats-panel">
-            <div class="stat-box">
-                <div id="total-sum" class="val">0</div>
-                <div class="lbl">Součet</div>
+        <div class="results-panel">
+            <div class="result-card">
+                <div id="total-sum" class="result-value">0</div>
+                <div class="result-label">Součet</div>
             </div>
-            <div class="stat-box">
-                <div id="roll-count" class="val">0</div>
-                <div class="lbl">Počet hodů</div>
-            </div>
-            <div class="stat-box">
-                <div id="average-val" class="val">0</div>
-                <div class="lbl">Průměr</div>
+            <div class="result-card">
+                <div id="roll-count" class="result-value">0</div>
+                <div class="result-label">Celkem hodů</div>
             </div>
         </div>
-
-        <!-- History Strip -->
-        <div class="history" id="history-log"></div>
     </div>
 
     <script>
-        let totalRollsCount = 0;
-        let cumulativeSum = 0;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let rollCounter = 0;
 
-        // Synthesize rolling sound effect without external files
-        function playRollSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.15);
-            
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
-        }
+        // Mathematical rotation mapping for 3D D6 faces
+        const rotations = {
+            1: { x: 0,   y: 0 },
+            2: { x: 0,   y: -90 },
+            3: { x: 90,  y: 0 },
+            4: { x: -90, y: 0 },
+            5: { x: 0,   y: 90 },
+            6: { x: 0,   y: 180 }
+        };
 
-        // Generate 3D standard D6 structure
-        function create3DDiceHTML() {
-            return `
-                <div class="scene">
-                    <div class="cube">
-                        <div class="cube-face face-1"><span class="pip"></span></div>
-                        <div class="cube-face face-2"><span class="pip"></span><span class="pip"></span></div>
-                        <div class="cube-face face-3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                        <div class="cube-face face-4"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                        <div class="cube-face face-5"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                        <div class="cube-face face-6"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                    </div>
+        function createCubeElement() {
+            const scene = document.createElement('div');
+            scene.className = 'scene';
+            scene.innerHTML = `
+                <div class="cube" data-x="0" data-y="0">
+                    <div class="cube-face face-1"><span class="pip"></span></div>
+                    <div class="cube-face face-2"><span class="pip"></span><span class="pip"></span></div>
+                    <div class="cube-face face-3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                    <div class="cube-face face-4"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                    <div class="cube-face face-5"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                    <div class="cube-face face-6"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
                 </div>
             `;
+            return scene;
         }
 
-        // Initialize dice layout
         function setupDice() {
             const container = document.getElementById('dice-playground');
-            const count = parseInt(document.getElementById('dice-count').value);
-            const type = parseInt(document.getElementById('dice-type').value);
-            
+            const count = parseInt(document.getElementById('dice-count').value, 10);
+            const type = parseInt(document.getElementById('dice-type').value, 10);
+
             container.innerHTML = '';
 
             for (let i = 0; i < count; i++) {
                 if (type === 6) {
-                    container.innerHTML += create3DDiceHTML();
+                    container.appendChild(createCubeElement());
                 } else {
                     const poly = document.createElement('div');
                     poly.className = 'poly-dice';
-                    poly.innerText = '?';
+                    poly.innerText = '-';
                     container.appendChild(poly);
                 }
             }
         }
 
-        // Main action trigger
         function rollAll() {
-            const diceType = parseInt(document.getElementById('dice-type').value);
-            const count = parseInt(document.getElementById('dice-count').value);
-            const playground = document.getElementById('dice-playground');
-            
-            playRollSound();
-            if (navigator.vibrate) navigator.vibrate(50); // Mobile haptic feedback
+            const type = parseInt(document.getElementById('dice-type').value, 10);
+            const container = document.getElementById('dice-playground');
+            let sum = 0;
 
-            let currentRollTotal = 0;
-
-            if (diceType === 6) {
-                const cubes = playground.querySelectorAll('.cube');
+            if (type === 6) {
+                const cubes = container.querySelectorAll('.cube');
                 cubes.forEach(cube => {
-                    const result = Math.floor(Math.random() * 6) + 1;
-                    currentRollTotal += result;
-                    
-                    // Generate wild random rotations + align to target face
-                    const xRots = [0, 0, -90, 90, 0, 180];
-                    const yRots = [0, -90, 0, 0, 90, 0];
-                    
-                    const extraSpinsX = (Math.floor(Math.random() * 3) + 2) * 360;
-                    const extraSpinsY = (Math.floor(Math.random() * 3) + 2) * 360;
-                    
-                    const targetX = xRots[result - 1] + extraSpinsX;
-                    const targetY = yRots[result - 1] + extraSpinsY;
+                    const value = Math.floor(Math.random() * 6) + 1;
+                    sum += value;
 
-                    cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+                    let currentX = parseInt(cube.getAttribute('data-x'), 10) || 0;
+                    let currentY = parseInt(cube.getAttribute('data-y'), 10) || 0;
+
+                    const target = rotations[value];
+
+                    // Add full 360-degree rotations to preserve smooth animation flow
+                    let nextX = currentX + 720 + (target.x - (currentX % 360));
+                    let nextY = currentY + 720 + (target.y - (currentY % 360));
+
+                    cube.style.transform = `rotateX(${nextX}deg) rotateY(${nextY}deg)`;
+                    cube.setAttribute('data-x', nextX);
+                    cube.setAttribute('data-y', nextY);
                 });
             } else {
-                const polyDice = playground.querySelectorAll('.poly-dice');
+                const polyDice = container.querySelectorAll('.poly-dice');
                 polyDice.forEach(dice => {
-                    const result = Math.floor(Math.random() * diceType) + 1;
-                    currentRollTotal += result;
+                    const value = Math.floor(Math.random() * type) + 1;
+                    sum += value;
 
-                    dice.style.transform = 'scale(0.8) rotate(360deg)';
+                    dice.style.transform = 'scale(0.9)';
                     setTimeout(() => {
-                        dice.innerText = result;
-                        dice.style.transform = 'scale(1) rotate(0deg)';
-                    }, 300);
+                        dice.innerText = value;
+                        dice.style.transform = 'scale(1)';
+                    }, 150);
                 });
             }
 
-            // Update stats
-            setTimeout(() => {
-                totalRollsCount++;
-                cumulativeSum += currentRollTotal;
-                
-                document.getElementById('total-sum').innerText = currentRollTotal;
-                document.getElementById('roll-count').innerText = totalRollsCount;
-                document.getElementById('average-val').innerText = (cumulativeSum / (totalRollsCount * count)).toFixed(1);
-
-                // Add item to history
-                const history = document.getElementById('history-log');
-                const chip = document.createElement('div');
-                chip.className = 'history-chip';
-                chip.innerText = `#${totalRollsCount}: ${currentRollTotal}`;
-                history.prepend(chip);
-            }, 800);
+            rollCounter++;
+            document.getElementById('total-sum').innerText = sum;
+            document.getElementById('roll-count').innerText = rollCounter;
         }
 
-        function changeTheme(themeName) {
-            document.body.setAttribute('data-theme', themeName);
-        }
-
-        // Initial setup on load
+        // Initialize default view
         setupDice();
     </script>
 </body>
